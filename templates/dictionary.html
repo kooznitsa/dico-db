@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1>{{ the_title }}</h1>
+<form name="submit-review" action="{{ url_for('search_items') }}" method="GET">
+      <input name="phrase" value="{{ user_input }}" type="text" placeholder="Введите слово или часть слова" aria-label="Поиск слова" />  
+      <select name="category">
+            <option value="all" {% if category=='all' %} selected {% endif %}>Выберите категорию</option>
+            {% for option in options %}
+            <option value="{{ option[0] }}" {% if category==option[0] %} selected {% endif %}>{% if option[0]=='' %} Без категории {% endif %}{{ option[0] }}</option>
+            {% endfor %}
+      </select>
+      <div class="radio-group">
+            <p>Сортировать по:</p>
+            <label>
+                  <input name="sort" type="radio" value="fr" />
+                  <span>FRA</span>
+            </label>
+            <label>
+                  <input name="sort" type="radio" value="ru" />
+                  <span>RUS</span>
+            </label>
+            <label>
+                  <input name="sort" type="radio" value="id" />
+                  <span>Без сортировки</span>
+            </label>
+      </div>
+      <div class="btn-group">
+            <button type="submit" class="button">Искать</button>
+            <a href="/" id="refresh-btn" type="button" title="Очистить"></a>
+      </div>
+</form>
+<p><a href="/add-row" class="highlighted">>>> Добавить термин</a></p>
+<table>
+      <colgroup>
+            <col style="width:38%">
+            <col style="width:38%">
+            <col style="width:12%">
+            <col style="width:10%">
+            <col style="width:20px">
+      </colgroup>
+      <tbody>
+      <tr>
+            <th>Французский</th>
+            <th>Русский</th>
+            <th>Комментарий</th>
+            <th>Категория</th>
+            <th class="edit-icon" title="Редактировать"></th>
+      </tr>
+      {% for col in results %}
+      <tr>
+            <td>{{ col[1] }}</td>
+            <td>{{ col[2] }}</td>
+            <td>{{ col[3] }}</td>
+            <td>{{ col[4] }}</td>
+            <td class="edit-icon" title="Редактировать">
+                  <span class="invisible">{{ col[0] }}</span>
+                  <a href="/edit/{{ col[0] }}" target="_blank">
+                        <img src="{{ url_for('static', filename='edit.png') }}">
+                  </a>
+            </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+</table>
+<p>Всего строк: {{ total_rows }}</p>
+<p>Показано строк: {{ shown_rows }}</p>
+{% endblock %}

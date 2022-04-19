@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1>{{ the_title }}</h1>
+<form name="submit-review" action="" method="POST">
+        <textarea name="fr" placeholder="Французский" aria-label="Французский" class="blue"></textarea>
+        <textarea name="ru" placeholder="Русский" aria-label="Русский" class="red"></textarea>                        
+        <input name="comment" type="text" placeholder="Комментарий" aria-label="Комментарий" />
+        <input name="category" type="text" placeholder="Категория" aria-label="Категория" />
+        <button type="submit" class="button">Добавить</button>
+</form>
+{% endblock %}
