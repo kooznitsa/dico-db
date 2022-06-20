@@ -4,7 +4,7 @@ import pymysql
 
 db = pymysql.connect(host='127.0.0.1',
                                     user='root',
-                                    password='***',
+                                    password='akulabutaforia42',
                                     database='dico_db',
                                     charset='utf8')
 
@@ -41,6 +41,7 @@ def show_table():
     cursor = db.cursor()
 
     total_rows = cursor.execute("SELECT * FROM dico")
+    shown_rows = cursor.execute("SELECT * FROM dico LIMIT 10")
     results = cursor.fetchall()
 
     cursor.execute("""SELECT DISTINCT CONCAT(UCASE(LEFT(category, 1)), \
@@ -54,7 +55,7 @@ def show_table():
                                             options=options,
                                             the_title='Французско-русский словарь', 
                                             total_rows=total_rows, 
-                                            shown_rows=total_rows)
+                                            shown_rows=shown_rows)
 
 
 @app.route('/search', methods=['GET'])
