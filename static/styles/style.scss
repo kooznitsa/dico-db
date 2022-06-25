@@ -171,10 +171,10 @@ button {
   }  
 
   &.delete-btn {
-    background-image: none;
-    background: url(../images/delete.png) no-repeat blue;
-    background-size: 30px 30px;
-    background-position: 3px 7px;
+  background-image: none;
+  background: url(../images/delete.png) no-repeat blue;
+  background-size: 30px 30px;
+  background-position: 3px 7px;
   }
 }  
 
@@ -213,4 +213,13 @@ button {
 
 .invisible {
   display: none;
+}
+
+.error-message {
+  color: $color-red;
+}
+
+.preloader {
+  display: none;
+  color: $color-blue;
 }

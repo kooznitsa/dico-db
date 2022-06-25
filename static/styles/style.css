@@ -211,3 +211,12 @@ button {
 .invisible {
   display: none;
 }
+
+.error-message {
+  color: #b62121;
+}
+
+.preloader {
+  display: none;
+  color: #1642a1;
+}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1>{{ the_title }}</h1>
+<div class="error-message">{{ error_message }}</div>
+<div class="preloader">Ожидайте, ваш запрос обрабатывается...</div>
+<form name="submit-text" action="{{ url_for('get_hint') }}" method="GET">
+        <textarea name="input_text" placeholder="Введите текст" aria-label="Введите текст" value="{{ input_text }}">{{ input_text }}</textarea>                      
+        <div class="btn-group">
+            <button type="submit" class="button" onclick="loading();" >Показать подсказки</button>
+            <a href="/get-hint" id="refresh-btn" type="button" title="Очистить"></a>
+      </div>
+    <script type="text/javascript">
+        function loading() {
+            let preloader = document.getElementsByClassName('preloader')[0];
+            preloader.style.display = 'block';
+            setTimeout(function(){
+                preloader.style.display = 'none';
+            }, 40000);
+        };
+    </script>
+</form>
+
+<p><a href="/" class="highlighted">>>> Вернуться в словарь</a></p>
+<p><a href="/add-row" class="highlighted">>>>Добавить термин</a></p>
+
+<table>
+    <colgroup>
+        <col style="width:50%">
+        <col style="width:50%">
+    </colgroup>
+    <tbody>
+    <tr>
+        <th>Французский</th>
+        <th>Русский</th>
+    </tr>
+    {% for col in results %}
+    <tr>
+        <td>{{ col['fr'] }}</td>
+        <td>{{ col['ru'] }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

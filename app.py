@@ -1,6 +1,9 @@
 import sys
 from flask import Flask, request, render_template, redirect, url_for
 import pymysql
+import string
+from nltk.corpus import stopwords
+
 
 db = pymysql.connect(host='127.0.0.1',
                                     user='root',
@@ -152,6 +155,49 @@ def edit(id):
         cursor.execute(delete, (id))
         db.commit()
         return render_template('update.html', message='Термин удален.')
+
+
+def edit_text(text):
+    stop_words = stopwords.words('french')
+    if text:
+        text = text.replace('/', ' ') \
+                        .translate(str.maketrans("", "", string.punctuation))
+        text  = [word for word in text.split() if word.lower() not in stop_words]
+    return text
+
+
+@app.route('/get-hint', methods=['GET'])
+def get_hint():
+# 1. Find dict words in text input
+# 2. Print corresponding dict FR, RU values
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    cursor.execute("SELECT fr, ru FROM dico")
+
+    dictionary = cursor.fetchall()
+    input_text = request.args.get('input_text')
+
+    output = []
+    error_message = ''
+
+    if not input_text:
+        input_text = 'Введите текст на французском языке'
+    elif len(input_text) > 275:
+        error_message = 'Ошибка! Длина текста не должна превышать 275 символов.'
+    else:
+        for i in dictionary:
+            i['fr_split'] = edit_text(i['fr'])
+
+        for d in dictionary:
+            if any(i in edit_text(input_text) for i in d['fr_split']):
+                entry = {key: value for key, value in d.items()}
+                output.append(entry)
+
+        [i.pop('fr_split') for i in output]
+
+    return render_template('get-hint.html', the_title='Получите подсказки', \
+                                                                results=output, \
+                                                                input_text=input_text,\
+                                                                error_message=error_message)
 
 
 if __name__ == '__main__':
