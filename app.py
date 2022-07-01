@@ -1,17 +1,19 @@
 import sys
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template
 import pymysql
 import string
 from nltk.corpus import stopwords
+import pandas as pd
 
 
 db = pymysql.connect(host='127.0.0.1',
                                     user='root',
-                                    password='akulabutaforia42',
+                                    password='***',
                                     database='dico_db',
                                     charset='utf8')
 
 app = Flask(__name__)
+cursor = db.cursor()
 
 
 @app.route('/add-row')
@@ -26,8 +28,6 @@ def notify():
 
 @app.route('/add-row', methods=['POST'])
 def update():
-    cursor = db.cursor()
-
     fr = request.form['fr']
     ru = request.form['ru']
     comment = request.form['comment']
@@ -41,8 +41,6 @@ def update():
 
 @app.route('/', methods=['GET'])
 def show_table():
-    cursor = db.cursor()
-
     total_rows = cursor.execute("SELECT * FROM dico")
     shown_rows = cursor.execute("SELECT * FROM dico LIMIT 10")
     results = cursor.fetchall()
@@ -63,8 +61,6 @@ def show_table():
 
 @app.route('/search', methods=['GET'])
 def search_items():
-    cursor = db.cursor()
-
     user_input = request.args['phrase']
     category = request.args['category']
     sorting = request.args.get('sort', 'id')
@@ -103,8 +99,6 @@ def search_items():
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit(id):
     if request.method == 'GET':
-        cursor = db.cursor()
-
         sql = "SELECT * FROM dico WHERE id = %s"
         cursor.execute(sql, (id))
         results = cursor.fetchall()
@@ -122,8 +116,7 @@ def edit(id):
                                                 comment_item=comment_item,
                                                 category_item=category_item)
     
-    elif 'edit' in request.form:
-        cursor = db.cursor()        
+    elif 'edit' in request.form:    
         select = "SELECT * FROM dico WHERE id = %s"
         cursor.execute(select, (id))
         results = cursor.fetchall()
@@ -150,7 +143,6 @@ def edit(id):
         return render_template('update.html', message='Термин изменен.')
 
     elif 'delete' in request.form:
-        cursor = db.cursor() 
         delete = "DELETE FROM dico_db.dico WHERE id = %s"
         cursor.execute(delete, (id))
         db.commit()
@@ -170,12 +162,11 @@ def edit_text(text):
 def get_hint():
 # 1. Find dict words in text input
 # 2. Print corresponding dict FR, RU values
-    cursor = db.cursor(pymysql.cursors.DictCursor)
+
     cursor.execute("SELECT fr, ru FROM dico")
+    results = cursor.fetchall()
 
-    dictionary = cursor.fetchall()
     input_text = request.args.get('input_text')
-
     output = []
     error_message = ''
 
@@ -184,15 +175,13 @@ def get_hint():
     elif len(input_text) > 275:
         error_message = 'Ошибка! Длина текста не должна превышать 275 символов.'
     else:
-        for i in dictionary:
-            i['fr_split'] = edit_text(i['fr'])
-
-        for d in dictionary:
-            if any(i in edit_text(input_text) for i in d['fr_split']):
-                entry = {key: value for key, value in d.items()}
-                output.append(entry)
-
-        [i.pop('fr_split') for i in output]
+        df = pd.DataFrame(results)
+        df.rename(columns={0:'fr', 1:'ru'}, inplace=True)
+        df['fr_split'] = df['fr'].apply(lambda x: edit_text(x))
+        search_list = set(edit_text(input_text))
+        df['result'] = df['fr_split'].apply(lambda x: set.intersection(set(x), search_list))
+        filtered = df[df['result'].apply(lambda x: len(x)) > 0][['fr', 'ru']]
+        output = filtered.to_dict('records')
 
     return render_template('get-hint.html', the_title='Получите подсказки', \
                                                                 results=output, \
