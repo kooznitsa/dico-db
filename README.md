@@ -8,11 +8,8 @@
 - Translation hints
 
 ## Tech Stack
-- Flask
-- MySQL
-- Selenium
-- Pandas
-- NLTK
+
+<img src="https://img.shields.io/badge/Flask-fc884d?style=for-the-badge&logo=Flask&logoColor=black"/> <img src="https://img.shields.io/badge/MySQL-f5df66?style=for-the-badge&logo=MySQL&logoColor=black"/> <img src="https://img.shields.io/badge/pandas-65a362?style=for-the-badge&logo=pandas&logoColor=black"/> <img src="https://img.shields.io/badge/Selenium-65a362?style=for-the-badge&logo=Selenium&logoColor=black"/> <img src="https://img.shields.io/badge/HTML5-96a4a5?style=for-the-badge&logo=HTML5&logoColor=black"/> <img src="https://img.shields.io/badge/CSS3-96a4a5?style=for-the-badge&logo=CSS3&logoColor=black"/> 
 
 ## Website Pages
 
